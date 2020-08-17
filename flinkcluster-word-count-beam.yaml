@@ -1,0 +1,40 @@
+apiVersion: flinkoperator.k8s.io/v1beta1
+kind: FlinkCluster
+metadata:
+  name: flinkcluster-word-count-beam
+spec:
+  image:
+    name: youngwookim/word-count-beam-flink:latest
+  jobManager:
+    ports:
+      ui: 8081
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+  taskManager:
+    replicas: 1
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "500m"
+  job:
+    jarFile: /opt/beam-job.jar
+    className: org.apache.beam.examples.WordCount
+    #savepoint: gs://my-bucket/path-to-savepoints/savepoint-1234
+    #savepointsDir: gs://my-bucket/path-to-savepoints
+    #autoSavepointSeconds: 300
+    args:
+      [
+        "--runner=FlinkRunner",
+        "--output=/tmp/output"
+      ]
+    parallelism: 1
+    #hadoopConfig:
+    #  configMapName: hadoop-configmap
+    #  mountPath: /etc/hadoop/conf
+    #gcpConfig:
+      #serviceAccount:
+        #secretName: gcp-service-account-secret
+        #keyFile: gcp_service_account_key.json
+        #mountPath: /etc/gcp/keys
